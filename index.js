@@ -9,6 +9,7 @@ var bakery = require('openbadges-bakery');
 var uuid = require('node-uuid');
 var knox = require('knox');
 var config = require('config-store')(path.join(__dirname, './config.json'));
+var minstache = require('minstache');
 var fs = require('fs');
 var url = require('url');
 
@@ -61,13 +62,16 @@ function Uploader (opts) {
 function Emailer (opts) {
 
   var client = new mandrill.Mandrill(opts.key);
+  var body = minstache.compile(fs.readFileSync('./mail.mustache').toString());
 
   this.send = function (opts) {
     var msg = {
-      "html": "<h1>Hello!</h1><p>This is a test. This badge should be baked: <img src=\"cid:BADGE\"></p><p>Try saving it, then uploading it to the Backpack.</p>",
-      "subject": "TEST!",
+      "html": body({
+        signature: opts.badge.contents
+      }),
+      "subject": "Badgecub Test",
       "to": [{
-        email: "mikelarssonftw@gmail.com",
+        email: opts.to,
         type: "to"
       }],
       "from_email": "mikelarssonftw@gmail.com",
@@ -142,7 +146,7 @@ function Badge (opts) {
 
   var badge = {
     name: opts.name,
-    descriptions: opts.description,
+    description: opts.description,
     image: url.resolve(ISSUER_URL, this.imageUrl),
     criteria: url.resolve(ISSUER_URL, "/criteria.html"),
     issuer: url.resolve(ISSUER_URL, "/issuer.json")
@@ -181,6 +185,10 @@ app.post('/issue', function (req, res, next) {
   var desc = req.body.desc;
   var imgFile = req.files.badgeImg;
   var recipient = req.body.recipient;
+
+  if (!(name && desc && imgFile && recipient)) {
+    return res.send(500);
+  }
 
   var badge = new Badge({name: name, description: desc, image: imgFile});
 
