@@ -8,12 +8,19 @@ var jws = require('jws');
 var bakery = require('openbadges-bakery');
 var uuid = require('node-uuid');
 var knox = require('knox');
+var config = require('config-store')(path.join(__dirname, './config.json'));
 var fs = require('fs');
 var url = require('url');
 
-const PORT = process.env.PORT || 3001;
-const PRIVATE_KEY = fs.readFileSync('./rsa-private.pem');
-const ISSUER_URL = "http://mlarsson.s3-website-us-east-1.amazonaws.com/";
+const PORT = config('PORT', 3001);
+const PRIVATE_KEY = fs.readFileSync(config('PRIVATE_KEY', './rsa-private.pem'));
+const ISSUER_URL = config('ISSUER_URL');
+const MANDRILL_KEY = config('MANDRILL_KEY');
+const AWS_CREDENTIALS = {
+  key: config('AWS_KEY'),
+  secret: config('AWS_SECRET'),
+  bucket: config('AWS_BUCKET')
+};
 
 function Uploader (opts) {
   var client = knox.createClient(opts);
@@ -161,13 +168,9 @@ app.use('/static', express.static(path.join(__dirname, '/static')));
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader());
 env.express(app);
 
-var uploader = new Uploader({
-  key: "AKIAJ2FZEW4UWWBKCT3Q",
-  secret: "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",
-  bucket: "mlarsson"
-});
+var uploader = new Uploader(AWS_CREDENTIALS);
 var emailer = new Emailer({
-  key: 'wiY-RZW09O0LIUI8VItb0Q'
+  key: MANDRILL_KEY
 });
 
 app.get('/', function (req, res, next) {
