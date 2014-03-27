@@ -1,0 +1,21 @@
+{
+  "name": "Badgecub",
+  "description": "Light-duty badge issuing",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "Mike Larsson <stenington@gmail.com>",
+  "readmeFilename": "README.md",
+  "dependencies": {
+    "node-uuid": "~1.4.1",
+    "mandrill-api": "~1.0.39",
+    "jws": "~0.2.5",
+    "config-store": "~0.3.1",
+    "bluebird": "~1.1.1",
+    "request": "~2.34.0",
+    "knox": "~0.8.9",
+    "openbadges-bakery": "~1.0.2",
+    "nunjucks": "~1.0.2",
+    "express": "~3.5.1"
+  },
+  "devDependencies": {}
+}
