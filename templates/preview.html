@@ -1,17 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Badglet</title>
-  <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.1.1/css/normalize.min.css" type="text/css" rel="stylesheet">
-  <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.1.1/css/foundation.min.css" type="text/css" rel="stylesheet">
-</head>
-<body>
+{% extends "layout.html" %}
+{% block body %}
   <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 text-center columns">
       <h1>Your preview:</h1>
-      {% include "mail.html" %}
-      <a href="/" class="button secondary">Cancel</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-12 large-8 large-centered columns">
+      <div class="panel radius">
+        {% include "mail.html" %}
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="small-12 text-center columns">
       <form action="/" method="post" enctype="multipart/form-data">
         <input type="hidden" name="name" value="{{passthrough.name}}">
         <input type="hidden" name="desc" value="{{passthrough.description}}">
@@ -19,8 +21,8 @@
         <input type="hidden" name="msg" value="{{passthrough.message}}">
         <input type="hidden" name="filePath" value="{{passthrough.filePath}}">
         <button type="submit" name="action" value="issue">Give</button>
+        <a href="/" class="button secondary">Cancel</a>
       </form>
     </div>
   </div>
-</body>
-</html>
+{% endblock %}
