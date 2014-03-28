@@ -11,6 +11,15 @@
     <div class="small-12 columns">
       <h1>Your preview:</h1>
       {% include "mail.html" %}
+      <a href="/" class="button secondary">Cancel</a>
+      <form action="/" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="name" value="{{passthrough.name}}">
+        <input type="hidden" name="desc" value="{{passthrough.description}}">
+        <input type="hidden" name="recipient" value="{{passthrough.recipient}}">
+        <input type="hidden" name="msg" value="{{passthrough.message}}">
+        <input type="hidden" name="filePath" value="{{passthrough.filePath}}">
+        <button type="submit" name="action" value="issue">Give</button>
+      </form>
     </div>
   </div>
 </body>

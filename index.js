@@ -3,10 +3,20 @@ var nunjucks = require('nunjucks');
 var path = require('path');
 var config = require('config-store')(path.join(__dirname, './config.json'));
 var fs = require('fs');
+var Promise = require('bluebird');
 var Uploader = require('./lib/uploader');
 var Emailer = require('./lib/emailer');
 var Badge = require('./lib/badge');
 var debug = require('./lib/debug');
+
+function DataURI (path) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(path, function (err, data) {
+      if (err) return reject(err);
+      else return resolve("data:image/png;base64," + data.toString('base64'));
+    });
+  });
+}
 
 const PORT = config('PORT', 3001);
 const PRIVATE_KEY = fs.readFileSync(config('PRIVATE_KEY', './rsa-private.pem'));
@@ -46,15 +56,13 @@ function checkData (req, res, next) {
   var name = req.body.name;
   var desc = req.body.desc;
   var imgFile = req.files.badgeImg;
+  var imgPath = req.body.filePath;
   var recipient = req.body.recipient;
   debug('Posted data', name, desc, recipient, imgFile);
 
-  if (!(name && desc && imgFile && recipient)) {
-    return res.send(500, "Missing parameter");
-  }
-  if (imgFile.size === 0) {
-    return res.send(500, "File size 0");
-  }
+  if (!(name && desc && recipient)) return res.send(500, "Missing parameter");
+  if (!(imgFile || imgPath)) return res.send(500, "No image");
+  if (!imgPath && imgFile.size === 0) return res.send(500, "File size 0");
 
   next();
 }
@@ -62,15 +70,33 @@ function checkData (req, res, next) {
 app.get('/', function (req, res, next) {
   return res.render('index.html');
 });
+
 app.post('/', [isAction('preview'), checkData], function (req, res, next) {
-  res.send('PREVIEW');
+  var dataUri = new DataURI(req.files.badgeImg.path);
+  dataUri.then(function (dataUri) {
+    return res.render('preview.html', {
+      imgSrc: dataUri,
+      signature: "Whatevs",
+      passthrough: {
+        name: req.body.name,
+        description: req.body.desc,
+        recipient: req.body.recipient,
+        message: req.body.msg,
+        filePath: req.files.badgeImg.path
+      }
+    });
+  }).catch(function (e) {
+    res.send(500, e);
+  });
 });
+
 app.post('/', [isAction('issue'), checkData], function (req, res, next) {
+  var imgPath = req.body.filePath || req.files.badgeImg.path;
   var recipient = req.body.recipient;
   var badge = new Badge({
     name: req.body.name, 
     description: req.body.desc, 
-    image: req.files.badgeImg,
+    imagePath: imgPath,
     issuerUrl: ISSUER_URL
   });
 
@@ -82,14 +108,12 @@ app.post('/', [isAction('issue'), checkData], function (req, res, next) {
     debug('Send email');
     return emailer.send({to: recipient, badge: baked});
   }).then(function () {
-    fs.readFile(req.files.badgeImg.path, function (err, data) {
-      if (err) return res.send(500, err);
-      debug('Done!');
-      var datauri = "data:image/png;base64," + data.toString('base64');
-      return res.render('sent.html', {
-        dataUrl: datauri,
-        recipient: recipient
-      });
+    return new DataURI(imgPath);
+  }).then(function (dataUri) {
+    debug('Done!');
+    return res.render('sent.html', {
+      dataUrl: dataUri,
+      recipient: recipient
     });
   }).catch(function (e) {
     debug('Error');
