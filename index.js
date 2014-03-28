@@ -61,17 +61,28 @@ function isAction (action) {
 }
 
 function checkData (req, res, next) {
-  var name = req.body.name;
-  var desc = req.body.desc;
+  var values = {};
+  values.name = req.body.name;
+  values.desc = req.body.desc;
+  values.recipient = req.body.recipient;
+  values.msg = req.body.msg;
   var imgFile = req.files.badgeImg;
   var imgPath = req.body.filePath;
-  var recipient = req.body.recipient;
-  debug('Posted data', name, desc, recipient, imgFile);
+  debug('Posted data', values, imgFile, imgPath);
 
-  if (!(name && desc && recipient)) return res.send(500, "Missing parameter");
-  if (!(imgFile || imgPath)) return res.send(500, "No image");
-  if (!imgPath && imgFile.size === 0) return res.send(500, "File size 0");
+  var errors = {};
+  if (!values.name) errors.name = "Title your masterpiece.";
+  if (!values.desc) errors.desc = "Say what this badge is all about.";
+  if (!values.recipient) errors.recipient = "You gotta send it to someone.";
+  if (!(imgFile || imgPath)) errors.badgeImg = "Your badge needs a face! Please choose an image.";
+  if (!imgPath && imgFile.size === 0) errors.badgeImg = "Your badge needs a face! Please choose an image.";
 
+  if (Object.keys(errors).length) {
+    return res.render('index.html', {
+      errors: errors,
+      values: values
+    });
+  }
   next();
 }
 
