@@ -5,6 +5,9 @@
   "main": "index.js",
   "author": "Mike Larsson <stenington@gmail.com>",
   "readmeFilename": "README.md",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha -R nyan test/*.test.js"
+  },
   "dependencies": {
     "node-uuid": "~1.4.1",
     "mandrill-api": "~1.0.39",
@@ -18,5 +21,8 @@
     "express": "~3.5.1",
     "minstache": "~1.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mocha": "~1.18.2",
+    "should": "~3.2.0-beta1"
+  }
 }

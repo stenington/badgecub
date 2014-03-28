@@ -29,9 +29,17 @@ const AWS_CREDENTIALS = {
 };
 const DEBUG = config('DEBUG', false);
 
+var bodyTpl = nunjucks.compile(fs.readFileSync(path.join(__dirname, './templates/mail.html')).toString());
 var uploader = new Uploader(AWS_CREDENTIALS);
 var emailer = new Emailer({
-  key: MANDRILL_KEY
+  key: MANDRILL_KEY,
+  template: bodyTpl,
+  subject: config('EMAIL_SUBJECT'),
+  from: {
+    name: config('EMAIL_FROM_NAME'),
+    email: config('EMAIL_FROM_EMAIL')
+  },
+  serviceUrl: config('SERVICE_URL', 'http://localhost:' + PORT)
 });
 
 var app = express();
