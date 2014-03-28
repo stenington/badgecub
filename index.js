@@ -72,11 +72,17 @@ app.get('/', function (req, res, next) {
 });
 
 app.post('/', [isAction('preview'), checkData], function (req, res, next) {
+  var badge = new Badge({
+    name: req.body.name, 
+    description: req.body.desc, 
+    imagePath: req.files.badgeImg.path,
+    issuerUrl: ISSUER_URL
+  });
   var dataUri = new DataURI(req.files.badgeImg.path);
   dataUri.then(function (dataUri) {
     return res.render('preview.html', {
       imgSrc: dataUri,
-      signature: "Whatevs",
+      badge: badge,
       passthrough: {
         name: req.body.name,
         description: req.body.desc,
@@ -106,7 +112,7 @@ app.post('/', [isAction('issue'), checkData], function (req, res, next) {
     return badge.makeAssertion(recipient).sign(PRIVATE_KEY).bake();
   }).then(function (baked) {
     debug('Send email');
-    return emailer.send({to: recipient, badge: baked});
+    return emailer.send({to: recipient, baked: baked});
   }).then(function () {
     return new DataURI(imgPath);
   }).then(function (dataUri) {
