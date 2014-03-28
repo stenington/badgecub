@@ -5,13 +5,9 @@
   <title>Badglet</title>
   <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.1.1/css/normalize.min.css" type="text/css" rel="stylesheet">
   <link href="//cdnjs.cloudflare.com/ajax/libs/foundation/5.1.1/css/foundation.min.css" type="text/css" rel="stylesheet">
-  <style>
-    .preview { max-width: 200px; max-height: 200px; margin-bottom: 20px; }
-    .bottom { vertical-align: bottom; }
-  </style>
 </head>
 <body>
-  <form action="/issue" method="post" enctype="multipart/form-data">
+  <form action="/" method="post" enctype="multipart/form-data">
     <div class="row">
       <div class="small-2 columns">
         <label for="change-img" class="right inline">Image:</label>
@@ -54,8 +50,8 @@
     </div>
     <div class="row">
       <div class="small-10 small-offset-2 columns">
-        <a href="#" class="button secondary">Preview</a>
-        <button type="submit">Give</button>
+        <button class="secondary" name="action" value="preview">Preview</button>
+        <button type="submit" name="action" value="issue">Give</button>
       </div>
     </div>
   </form>

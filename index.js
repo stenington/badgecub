@@ -1,17 +1,12 @@
 var express = require('express');
 var nunjucks = require('nunjucks');
-var request = require('request');
 var path = require('path');
-var mandrill = require('mandrill-api/mandrill');
-var Promise = require('bluebird');
-var jws = require('jws');
-var bakery = require('openbadges-bakery');
-var uuid = require('node-uuid');
-var knox = require('knox');
 var config = require('config-store')(path.join(__dirname, './config.json'));
-var minstache = require('minstache');
 var fs = require('fs');
-var url = require('url');
+var Uploader = require('./lib/uploader');
+var Emailer = require('./lib/emailer');
+var Badge = require('./lib/badge');
+var debug = require('./lib/debug');
 
 const PORT = config('PORT', 3001);
 const PRIVATE_KEY = fs.readFileSync(config('PRIVATE_KEY', './rsa-private.pem'));
@@ -22,146 +17,17 @@ const AWS_CREDENTIALS = {
   secret: config('AWS_SECRET'),
   bucket: config('AWS_BUCKET')
 };
+const DEBUG = config('DEBUG', false);
 
-function Uploader (opts) {
-  var client = knox.createClient(opts);
-
-  this.put = function (badge) {
-    var badgeUpload = new Promise(function (resolve, reject) {
-      var json = badge.asJSON();
-      var req = client.put(badge.url, {
-        'Content-Length': json.length,
-        'Content-Type': 'application/json',
-        'x-amz-acl': 'public-read'
-      });
-      req.on('response', function (res) {
-        if (200 === res.statusCode) return resolve();
-        else return reject(res.statusCode);
-      });
-      req.on('error', function (err) {
-        return reject(err);
-      });
-      req.end(json);
-    });
-    var imageUpload = new Promise(function (resolve, reject) {
-      var imgStream = fs.createReadStream(badge.image.path);
-      client.putStream(imgStream, badge.imageUrl, {
-        'Content-Length': badge.image.size,
-        'Content-Type': badge.image.type,
-        'x-amz-acl': 'public-read'
-      }, function (err, res) {
-        if (200 === res.statusCode) return resolve();
-        else if (err) return reject(err);
-        else return reject(res.statusCode);
-      });
-    });
-    return Promise.all([badgeUpload, imageUpload]);
-  };
-}
-
-function Emailer (opts) {
-
-  var client = new mandrill.Mandrill(opts.key);
-  var body = minstache.compile(fs.readFileSync('./mail.mustache').toString());
-
-  this.send = function (opts) {
-    var msg = {
-      "html": body({
-        signature: opts.badge.contents
-      }),
-      "subject": "Badgecub Test",
-      "to": [{
-        email: opts.to,
-        type: "to"
-      }],
-      "from_email": "mikelarssonftw@gmail.com",
-      "from_name": "Mandrill but kinda Mike",
-      "images": [{
-        "type": 'image/png',
-        //"name": imgRes.headers['x-file-name'],
-        "name": "BADGE",
-        "content": opts.badge.imageData.toString('base64')
-      }]
-    };
-
-    return new Promise(function (resolve, reject) {
-      client.messages.send({
-        message: msg,
-        async: false
-      }, resolve, reject);
-    });
-  };
-}
-
-function Signature (opts) {
-  var signature = jws.sign({
-    header: {alg: 'rs256'},
-    privateKey: PRIVATE_KEY,
-    payload: opts.assertion
-  });
-
-  this.bake = function () {
-    return new Promise(function (resolve, reject) {
-      var imgStream = fs.createReadStream(opts.image.path);
-      bakery.bake({
-        image: imgStream,
-        signature: signature
-      }, function (err, imageData) {
-        if (err) return reject(err);
-        return resolve({
-          contents: signature,
-          imageData: imageData
-        });
-      });
-    });
-  };
-}
-
-function Assertion (opts) {
-  var assertion = {
-    uid: opts.badge.id,
-    recipient: {
-      identity: opts.email,
-      type: "email",
-      hashed: false
-    },
-    badge: url.resolve(ISSUER_URL, opts.badge.url),
-    verify: {
-      type: "signed",
-      url: url.resolve(ISSUER_URL, "/publickey.pem")
-    },
-    issuedOn: (new Date()).toISOString()
-  };
-
-  this.sign = function () {
-    return new Signature({assertion: assertion, image: opts.badge.image});
-  };
-}
-
-function Badge (opts) {
-  this.id = uuid.v1();
-  this.image = opts.image;
-  this.url = "/" + this.id + ".json";
-  this.imageUrl = "/" + this.id + ".png";
-
-  var badge = {
-    name: opts.name,
-    description: opts.description,
-    image: url.resolve(ISSUER_URL, this.imageUrl),
-    criteria: url.resolve(ISSUER_URL, "/criteria.html"),
-    issuer: url.resolve(ISSUER_URL, "/issuer.json")
-  }
-
-  this.makeAssertion = function (email) {
-    return new Assertion({badge: this, email: email}); 
-  };
-
-  this.asJSON = function () {
-    return JSON.stringify(badge);
-  };
-}
+var uploader = new Uploader(AWS_CREDENTIALS);
+var emailer = new Emailer({
+  key: MANDRILL_KEY
+});
 
 var app = express();
+
+var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'));
+env.express(app);
 
 app.use(express.json());
 app.use(express.urlencoded());
@@ -169,37 +35,65 @@ app.use(express.cookieParser());
 app.use(express.bodyParser());
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
-var env = new nunjucks.Environment(new nunjucks.FileSystemLoader());
-env.express(app);
+function isAction (action) {
+  return function (req, res, next) {
+    if (req.body.action && req.body.action === action) next();
+    else next('route');
+  };
+}
 
-var uploader = new Uploader(AWS_CREDENTIALS);
-var emailer = new Emailer({
-  key: MANDRILL_KEY
-});
-
-app.get('/', function (req, res, next) {
-  return res.render('index.html');
-});
-app.post('/issue', function (req, res, next) {
+function checkData (req, res, next) {
   var name = req.body.name;
   var desc = req.body.desc;
   var imgFile = req.files.badgeImg;
   var recipient = req.body.recipient;
+  debug('Posted data', name, desc, recipient, imgFile);
 
   if (!(name && desc && imgFile && recipient)) {
-    return res.send(500);
+    return res.send(500, "Missing parameter");
+  }
+  if (imgFile.size === 0) {
+    return res.send(500, "File size 0");
   }
 
-  var badge = new Badge({name: name, description: desc, image: imgFile});
+  next();
+}
 
+app.get('/', function (req, res, next) {
+  return res.render('index.html');
+});
+app.post('/', [isAction('preview'), checkData], function (req, res, next) {
+  res.send('PREVIEW');
+});
+app.post('/', [isAction('issue'), checkData], function (req, res, next) {
+  var recipient = req.body.recipient;
+  var badge = new Badge({
+    name: req.body.name, 
+    description: req.body.desc, 
+    image: req.files.badgeImg,
+    issuerUrl: ISSUER_URL
+  });
+
+  debug('Start upload');
   uploader.put(badge).then(function (results) {
-    return badge.makeAssertion(recipient).sign().bake();
+    debug('Make & bake badge');
+    return badge.makeAssertion(recipient).sign(PRIVATE_KEY).bake();
   }).then(function (baked) {
+    debug('Send email');
     return emailer.send({to: recipient, badge: baked});
   }).then(function () {
-    res.send('ok');
+    fs.readFile(req.files.badgeImg.path, function (err, data) {
+      if (err) return res.send(500, err);
+      debug('Done!');
+      var datauri = "data:image/png;base64," + data.toString('base64');
+      return res.render('sent.html', {
+        dataUrl: datauri,
+        recipient: recipient
+      });
+    });
   }).catch(function (e) {
-    res.send(500);
+    debug('Error');
+    res.send(500, e);
   });
 });
 
