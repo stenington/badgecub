@@ -31,3 +31,43 @@ footer small {
   background-color: #FFF;
 }
 
+.button,
+.button:hover,
+.button:focus,
+.button:active,
+button,
+button:hover,
+button:focus,
+button:active {
+  position: relative;
+  background: url('/static/btn-left.png') no-repeat,
+    url('/static/btn-right.png') no-repeat right,
+    url('/static/btn.png');
+  height: 39px;
+  line-height: 39px;
+  padding: 0 30px;
+  border-radius: 15px;
+  box-shadow: #E5E5E5 0 5px 1px;
+}
+.button:active,
+button:active {
+  top: 2px;
+  box-shadow: #E5E5E5 0 3px 1px;
+}
+.button:focus,
+button:focus {
+  outline: 0;
+}
+.button.secondary,
+.button.secondary:hover,
+.button.secondary:focus,
+.button.secondary:active,
+button.secondary,
+button.secondary:hover,
+button.secondary:focus,
+button.secondary:active {
+  background: url('/static/gbtn-left.png') no-repeat,
+    url('/static/gbtn-right.png') no-repeat right,
+    url('/static/gbtn.png');
+  color: white;
+}
