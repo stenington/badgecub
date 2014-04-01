@@ -71,3 +71,6 @@ button.secondary:active {
     url('/static/gbtn.png');
   color: white;
 }
+.error small.error {
+  background-color: #F8933B;
+}

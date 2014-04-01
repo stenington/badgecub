@@ -71,11 +71,11 @@ function checkData (req, res, next) {
   debug('Posted data', values, imgFile, imgPath);
 
   var errors = {};
-  if (!values.name) errors.name = "Title your masterpiece.";
-  if (!values.desc) errors.desc = "Say what this badge is all about.";
-  if (!values.recipient) errors.recipient = "You gotta send it to someone.";
-  if (!(imgFile || imgPath)) errors.badgeImg = "Your badge needs a face! Please choose an image.";
-  if (!imgPath && imgFile.size === 0) errors.badgeImg = "Your badge needs a face! Please choose an image.";
+  if (!values.name) errors.name = "Required";
+  if (!values.desc) errors.desc = "Required";
+  if (!values.recipient) errors.recipient = "Required";
+  if (!(imgFile || imgPath)) errors.badgeImg = "Required";
+  if (!imgPath && imgFile.size === 0) errors.badgeImg = "Required";
 
   if (Object.keys(errors).length) {
     return res.render('index.html', {
