@@ -102,6 +102,7 @@ app.post('/', [isAction('preview'), checkData], function (req, res, next) {
     return res.render('preview.html', {
       imgSrc: dataUri,
       badge: badge,
+      message: req.body.msg,
       passthrough: {
         name: req.body.name,
         description: req.body.desc,
@@ -131,7 +132,7 @@ app.post('/', [isAction('issue'), checkData], function (req, res, next) {
     return badge.makeAssertion(recipient).sign(PRIVATE_KEY).bake();
   }).then(function (baked) {
     debug('Send email');
-    return emailer.send({to: recipient, baked: baked});
+    return emailer.send({to: recipient, msg: req.body.msg, baked: baked});
   }).then(function () {
     return new DataURI(imgPath);
   }).then(function (dataUri) {
