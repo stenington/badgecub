@@ -17,6 +17,7 @@ Specify in the environment:
     * `PRIVATE_KEY`: Path to private key .pem, default: `./rsa-private.pem`
     * `PORT`: Port to use, default: 3001
     * `SERVICE_URL`: Url to use for linking back to the app, default: http://localhost:<PORT>
+    * `ASSERTION_SALT`: Salt to use when hashing email addresses, default: undefined
     * `DEBUG`: Turn debug on, default: false
 
 or write a `./config.json` file with similar keys, like:
@@ -42,6 +43,9 @@ or write a `./config.json` file with similar keys, like:
       "name": "me",
       "email": "me@example.org"
     }
+  },
+  "assertion": {
+    "salt": "salty"
   }
 }
 ```
