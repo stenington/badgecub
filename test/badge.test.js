@@ -50,11 +50,23 @@ describe('badge', function () {
       imagePath: "./some/path",
       issuerUrl: "http://example.org/some-url"
     });
-    var a = b.makeAssertion("email@example.org"); 
+    var a = b.makeAssertion({email: "email@example.org"});
     a.data.should.have.keys('uid', 'recipient', 'badge', 'verify', 'issuedOn');
     a.data.uid.should.equal(b.id);
     a.data.recipient.identity.should.equal("email@example.org");
     a.data.badge.should.include(b.url);
+  });
+
+  it('should return assertion with hashed identity', function () {
+    var b = new Badge({
+      name: "Test",
+      description: "A test.",
+      imagePath: "./some/path",
+      issuerUrl: "http://example.org/some-url"
+    });
+    var a = b.makeAssertion({email: "email@example.org", hashed: true, salt: "salty"});
+    a.data.should.have.property('recipient');
+    a.data.recipient.identity.should.include("sha256$");
   });
 
   it('should return signature from assertion', function () {
@@ -65,7 +77,7 @@ describe('badge', function () {
       imagePath: "./some/path",
       issuerUrl: "http://example.org/some-url"
     });
-    var s = b.makeAssertion("email@example.org").sign(key); 
+    var s = b.makeAssertion({email: "email@example.org"}).sign(key);
     s.data.should.match(/^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/);
   });
 
@@ -77,9 +89,9 @@ describe('badge', function () {
       imagePath: path.join(__dirname, "./default.png"),
       issuerUrl: "http://example.org/some-url"
     });
-    var s = b.makeAssertion("email@example.org").sign(key);
+    var s = b.makeAssertion({email: "email@example.org"}).sign(key);
     s.bake().then(function (baked) {
-      s.data.should.equal(baked.signature); 
+      s.data.should.equal(baked.signature);
       baked.imageData.should.be.an.instanceof(Buffer);
       baked.badge.should.equal(b);
       done();

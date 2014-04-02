@@ -129,7 +129,11 @@ app.post('/', [isAction('issue'), checkData], function (req, res, next) {
   debug('Start upload');
   uploader.put(badge).then(function (results) {
     debug('Make & bake badge');
-    return badge.makeAssertion(recipient).sign(PRIVATE_KEY).bake();
+    return badge.makeAssertion({
+      email: recipient,
+      hashed: true,
+      salt: config('ASSERTION_SALT', undefined)
+    }).sign(PRIVATE_KEY).bake();
   }).then(function (baked) {
     debug('Send email');
     return emailer.send({to: recipient, message: req.body.msg, baked: baked});
