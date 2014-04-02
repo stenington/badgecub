@@ -71,11 +71,11 @@ function checkData (req, res, next) {
   debug('Posted data', values, imgFile, imgPath);
 
   var errors = {};
-  if (!values.name) errors.name = "Required";
-  if (!values.desc) errors.desc = "Required";
-  if (!values.recipient) errors.recipient = "Required";
-  if (!(imgFile || imgPath)) errors.badgeImg = "Required";
-  if (!imgPath && imgFile.size === 0) errors.badgeImg = "Required";
+  if (!values.name) errors.name = "This is a required field";
+  if (!values.desc) errors.desc = "This is a required field";
+  if (!values.recipient) errors.recipient = "This is a required field";
+  if (!(imgFile || imgPath)) errors.badgeImg = "This is a required field";
+  if (!imgPath && imgFile.size === 0) errors.badgeImg = "This is a required field";
 
   if (Object.keys(errors).length) {
     return res.render('index.html', {
