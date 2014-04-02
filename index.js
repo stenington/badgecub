@@ -132,7 +132,7 @@ app.post('/', [isAction('issue'), checkData], function (req, res, next) {
     return badge.makeAssertion(recipient).sign(PRIVATE_KEY).bake();
   }).then(function (baked) {
     debug('Send email');
-    return emailer.send({to: recipient, msg: req.body.msg, baked: baked});
+    return emailer.send({to: recipient, message: req.body.msg, baked: baked});
   }).then(function () {
     return new DataURI(imgPath);
   }).then(function (dataUri) {
