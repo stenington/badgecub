@@ -18,6 +18,8 @@ Specify in the environment:
     * `PORT`: Port to use, default: 3001
     * `SERVICE_URL`: Url to use for linking back to the app, default: http://localhost:<PORT>
     * `ASSERTION_SALT`: Salt to use when hashing email addresses, default: undefined
+    * `ASSERTION_EXPIRES`: Number of days after which an assertion expires, default: no expiration
+    * `AWS_PATH`: A base path to use within the bucket, default: `/`
     * `DEBUG`: Turn debug on, default: false
 
 or write a `./config.json` file with similar keys, like:
@@ -35,7 +37,8 @@ or write a `./config.json` file with similar keys, like:
   "aws": {
     "key": "<KEY>",
     "secret": "<SHHHH>",
-    "bucket": "my_bucket"
+    "bucket": "my_bucket",
+    "path": "my/path/"
   },
   "email": {
     "subject": "Hi",
@@ -45,9 +48,13 @@ or write a `./config.json` file with similar keys, like:
     }
   },
   "assertion": {
-    "salt": "salty"
+    "salt": "salty",
+    "expires": 30
   }
 }
 ```
 
+## Data Cleanup
 
+Write a [lifecycle rule](http://docs.aws.amazon.com/AmazonS3/latest/dev/manage-lifecycle-using-console.html) on your S3 bucket to
+expire or transition the data under your `AWS_PATH` directory after `ASSERTION_EXPIRES` days.

@@ -37,7 +37,7 @@ describe('badge', function () {
     var json = b.asJSON();
     json.should.be.a.String;
     json = JSON.parse(json);
-    json.should.have.keys('name', 'description', 'image', 'criteria', 'issuer');
+    json.should.have.properties('name', 'description', 'image', 'criteria', 'issuer');
     json.name.should.equal("Test");
     json.description.should.equal("A test.");
     json.image.should.include(b.imageUrl);
@@ -51,7 +51,7 @@ describe('badge', function () {
       issuerUrl: "http://example.org/some-url"
     });
     var a = b.makeAssertion({email: "email@example.org"});
-    a.data.should.have.keys('uid', 'recipient', 'badge', 'verify', 'issuedOn');
+    a.data.should.have.properties('uid', 'recipient', 'badge', 'verify', 'issuedOn');
     a.data.uid.should.equal(b.id);
     a.data.recipient.identity.should.equal("email@example.org");
     a.data.badge.should.include(b.url);
