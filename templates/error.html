@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <div class="row">
+    <div class="small-12 medium-8 medium-offset-2 text-center columns">
+      <h1>We've encountered an error:</h1>
+      <pre class="panel callout">{{error}}</pre>
+      <a href="{{issueUrl}}" target="_blank" class="button">Report this error</a>
+    </div>
+  </div>
+{% endblock %}

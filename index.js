@@ -146,13 +146,12 @@ app.post('/', [isAction('preview'), prepForm({validate: true})], function (req, 
       passthrough: form.templateData()
     });
   }).catch(function (e) {
-    res.send(500, e);
+    next(e);
   });
 });
 
 app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, res, next) {
-  var form = req.form;
-  var data = form.formData();
+  var data = req.form.formData();
   var badge = new Badge({
     name: data.name,
     description: data.desc,
@@ -180,8 +179,25 @@ app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, re
       recipient: data.recipient
     });
   }).catch(function (e) {
-    debug('Error');
-    res.send(500, e);
+    next(e);
+  });
+});
+
+app.use(function(err, req, res, next) {
+  debug('Error', err);
+  var issueUrl = require('url').format({
+    protocol: "https",
+    host: "github.com",
+    pathname: "/stenington/badgecub/issues/new",
+    query: {
+      title: "Error encountered on " + (new Date()).toISOString(),
+      body: "```\n" + err + "\n```\n" 
+        + "\n\nPlease feel free to provide more context about what you were doing when the error occurred.\n\nThanks!"
+    }
+  });
+  return res.render('error.html', {
+    error: err,
+    issueUrl: issueUrl
   });
 });
 
