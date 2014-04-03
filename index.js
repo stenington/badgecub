@@ -9,6 +9,7 @@ var Emailer = require('./lib/emailer');
 var Badge = require('./lib/badge');
 var debug = require('./lib/debug');
 var Form = require('./lib/forms').Form;
+var sass = require('node-sass');
 
 function DataURI (path) {
   return new Promise(function (resolve, reject) {
@@ -52,6 +53,12 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.cookieParser());
 app.use(express.bodyParser());
+app.use(sass.middleware({
+  src: path.join(__dirname, "./styles"),
+  dest: path.join(__dirname, "./static/css"),
+  prefix: "/static/css",
+  debug: true
+}));
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
 function isAction (action) {
