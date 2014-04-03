@@ -124,7 +124,7 @@ function prepForm (opts) {
 
 app.get('/', [prepForm()], function (req, res, next) {
   return res.render('index.html', {
-    formFields: req.form.templateData() 
+    formFields: req.form.templateData()
   });
 });
 
@@ -151,7 +151,8 @@ app.post('/', [isAction('preview'), prepForm({validate: true})], function (req, 
 });
 
 app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, res, next) {
-  var data = req.form.formData();
+  var form = req.form;
+  var data = form.formData();
   var badge = new Badge({
     name: data.name,
     description: data.desc,
@@ -179,6 +180,13 @@ app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, re
       recipient: data.recipient
     });
   }).catch(function (e) {
+    return e.field && e.message;
+  }, function (e) {
+    form.error(e.field, e.message);
+    return res.render('index.html', {
+      formFields: form.templateData()
+    });
+  }).catch(function (e) {
     next(e);
   });
 });
@@ -191,7 +199,7 @@ app.use(function(err, req, res, next) {
     pathname: "/stenington/badgecub/issues/new",
     query: {
       title: "Error encountered on " + (new Date()).toISOString(),
-      body: "```\n" + err + "\n```\n" 
+      body: "```\n" + err + "\n```\n"
         + "\n\nPlease feel free to provide more context about what you were doing when the error occurred.\n\nThanks!"
     }
   });
