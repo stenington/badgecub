@@ -1,67 +1,15 @@
 {% extends "layout.html" %}
 
-{% macro errorClass(error) %}
-  {% if error %}error{% endif %}
-{% endmacro %}
-
-{% macro error(explanation) %}
-  {% if explanation %}
-  <small class="error">{{explanation}}</small>
-  {% endif %}
-{% endmacro %}
-
 {% block body %}
   <form action="/" method="post" enctype="multipart/form-data">
     <div class="row">
       <div class="small-12 text-center columns">
         <h1>Make a badge for someone you love.</h1>
       </div>
-      <div class="small-4 medium-2 large-offset-1 columns">
-        <label for="change-img" class="right inline">Image:</label>
-      </div>
-      <div class="small-8 medium-10 large-8 end columns {{errorClass(errors.badgeImg)}}">
-        <input type="file" accept="image/png" name="badgeImg" id="badgeImg"/>
-        {{error(errors.badgeImg)}}
-      </div>
     </div>
-    <div class="row">
-      <div class="small-4 medium-2 large-offset-1 columns">
-        <label for="name" class="inline right">Title:</label>
-      </div>
-      <div class="small-8 medium-10 large-8 end columns {{errorClass(errors.name)}}">
-        <input type="text" name="name" placeholder="Make it fun, add a pun." value="{{values.name}}">
-        {{error(errors.name)}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="small-4 medium-2 large-offset-1 columns">
-        <label for="desc" class="inline right">Description:</label>
-      </div>
-      <div class="small-8 medium-10 large-8 end columns {{errorClass(errors.desc)}}">
-        <input type="text" name="desc" placeholder="Keep it short and sweet. Fit it in a tweet." value="{{values.desc}}">
-        {{error(errors.desc)}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="small-4 medium-2 large-offset-1 columns">
-        <label for="recipient" class="inline right">Recipient's email:</label>
-      </div>
-      <div class="small-8 medium-10 large-8 end columns {{errorClass(errors.recipient)}}">
-        <input type="text" name="recipient" placeholder="Double check it, don't regret it." value="{{values.recipient}}">
-        {{error(errors.recipient)}}
-      </div>
-    </div>
-    <div class="row">
-      <div class="small-4 medium-2 large-offset-1 columns">
-        <label for="msg" class="inline right">Message:</label>
-      </div>
-      <div class="small-8 medium-10 large-8 end columns {{errorClass(errors.msg)}}">
-        <textarea name="msg" 
-            placeholder="Tell your badger why they deserve this masterpiece of a badge. If you have a link that proves it, add that in the mix too."
-            >{{values.msg}}</textarea>
-        {{error(errors.msg)}}
-      </div>
-    </div>
+    {% for el in formFields %}
+      {% include "form-element.html" %}
+    {% endfor %}
     <div class="row">
       <div class="small-12 text-center columns">
         <button class="secondary" name="action" value="preview">Preview</button>

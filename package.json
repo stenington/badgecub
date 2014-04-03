@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "mocha": "~1.18.2",
-    "should": "~3.2.0-beta1"
+    "should": "~3.2.0-beta1",
+    "cheerio": "~0.14.0"
   }
 }
