@@ -1,0 +1,12 @@
+<div class="row">
+  <div class="small-4 medium-2 large-offset-1 columns">
+    <label for="{{el.id}}" class="right inline">{{el.label}}:</label>
+  </div>
+  <div class="small-8 medium-10 large-8 end columns {% if el.error %}error{% endif %}">
+    <{{el.widget.tag}} 
+        {% for attr, val in el.widget.attrs %}{{attr}}="{{val}}" {% endfor %}
+        name="{{el.name}}" id="{{el.id}}">{% if el.widget.text %}{{el.widget.text}}{% endif %}</{{el.widget.tag}}>
+    {% if el.error %}<small class="error">{{el.error}}</small>{% endif %}
+    {% if el.hidden %}<input type="hidden" name="{{el.hidden.name}}" value="{{el.hidden.value}}"/>{% endif %}
+  </div>
+</div>

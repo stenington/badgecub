@@ -15,11 +15,10 @@
   <div class="row">
     <div class="small-12 text-center columns">
       <form action="/" method="post" enctype="multipart/form-data">
-        <input type="hidden" name="name" value="{{passthrough.name}}">
-        <input type="hidden" name="desc" value="{{passthrough.description}}">
-        <input type="hidden" name="recipient" value="{{passthrough.recipient}}">
-        <input type="hidden" name="msg" value="{{passthrough.message}}">
-        <input type="hidden" name="filePath" value="{{passthrough.filePath}}">
+        {% for el in passthrough %}
+          {% if el.hidden %}{% set el = el.hidden %}{% endif %}
+          <input type="hidden" name="{{el.name}}" value="{{el.value}}"/>
+        {% endfor %}
         <button type="submit" name="action" value="issue">Give</button>
         <a href="/" class="button secondary">Cancel</a>
       </form>
