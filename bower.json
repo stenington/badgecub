@@ -1,0 +1,23 @@
+{
+  "name": "BadgeCub",
+  "main": "index.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/stenington/badgecub",
+  "authors": [
+    "Mike Larsson <stenington@gmail.com>"
+  ],
+  "moduleType": [
+    "node"
+  ],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "~5.2.1"
+  }
+}
