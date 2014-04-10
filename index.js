@@ -57,7 +57,7 @@ app.use(sass.middleware({
   src: path.join(__dirname, "./styles"),
   dest: path.join(__dirname, "./static/css"),
   prefix: "/static/css",
-  debug: true
+  debug: DEBUG
 }));
 app.use('/static', express.static(path.join(__dirname, '/static')));
 
