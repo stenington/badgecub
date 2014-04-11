@@ -11,17 +11,19 @@
   {% endblock %}
 </head>
 <body>
-  {% block outer_body %}
-  <div class="page">
-    {% block body %}
+  <div class="container">
+    {% block outer_body %}
+    <div class="page">
+      {% block body %}
+      {% endblock %}
+      <footer>
+        <a href="/">
+          <img src="{{static('/mini_logo.png')}}" alt="BadgeCub logo small">
+          <small>An <strong>Open Badges</strong> project</small>
+        </a>
+      </footer>
+    </div>
     {% endblock %}
-    <footer>
-      <a href="/">
-        <img src="{{static('/mini_logo.png')}}" alt="BadgeCub logo small">
-        <small>An <strong>Open Badges</strong> project</small>
-      </a>
-    </footer>
   </div>
-  {% endblock %}
 </body>
 </html>

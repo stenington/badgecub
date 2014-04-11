@@ -39,11 +39,16 @@ $body-font-family:"Open Sans", "Helvetica Neue", sans-serif;
 body {
   background-color: #AAE5C0;
 }
+.container {
+  border: 0;
+  margin: 0;
+  padding:0;
+  padding-bottom: 3em;
+}
 .page {
   background-color: #FFF;
   margin-left: 5%;
   margin-right: 5%;
-  margin-bottom: 3em;
   padding-top: 3em;
   border-bottom-left-radius: 2em;
   border-bottom-right-radius: 2em;
