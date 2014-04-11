@@ -50,17 +50,30 @@ var app = express();
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'));
 env.express(app);
 
+var staticDir = path.join(__dirname, '/static');
+var staticRoot = '/static';
+var expiration = DEBUG ? 0 : 86400000 * 365;
+
+app.use(function (req, res, next) {
+  res.locals.static = function static (staticPath) {
+    var root = config('STATIC_ROOT', staticRoot);
+    return path.join(root, staticPath);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded());
 app.use(express.cookieParser());
 app.use(express.bodyParser());
+app.use(express.compress());
 app.use(sass.middleware({
   src: path.join(__dirname, "./styles"),
-  dest: path.join(__dirname, "./static/css"),
+  dest: path.join(staticDir, "css"),
   prefix: "/static/css",
   debug: DEBUG
 }));
-app.use('/static', express.static(path.join(__dirname, '/static')));
+app.use(staticRoot, express.static(staticDir, {maxAge: expiration}));
 
 function isAction (action) {
   return function (req, res, next) {
@@ -196,6 +209,14 @@ app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, re
     });
   }).catch(function (e) {
     next(e);
+  });
+});
+
+app.get('/:page.html', function (req, res, next) {
+  var template = path.join('page', req.params.page + '.html');
+  return res.render(template, function (err, html) {
+    if (err) return res.send(404);
+    return res.send(html);
   });
 });
 

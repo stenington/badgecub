@@ -21,6 +21,7 @@ Specify in the environment:
     * `ASSERTION_SALT`: Salt to use when hashing email addresses, default: undefined
     * `ASSERTION_EXPIRES`: Number of days after which an assertion expires, default: no expiration
     * `AWS_PATH`: A base path to use within the bucket, default: `/`
+    * `STATIC_ROOT`: The root path or url to prepend to static asset paths, default: /static
     * `DEBUG`: Turn debug on, default: false
 
 or write a `./config.json` file with similar keys, like:

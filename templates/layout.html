@@ -4,7 +4,7 @@
   {% block head %}
   <meta charset="utf-8">
   <title>BadgeCub</title>
-  <link href="/static/css/badgecub.css" type="text/css" rel="stylesheet">
+  <link href="{{static('/css/badgecub.css')}}" type="text/css" rel="stylesheet">
   {% block headend %}
   {% endblock %}
   {% endblock %}
@@ -15,7 +15,7 @@
     {% endblock %}
     <footer>
       <a href="/">
-        <img src="/static/mini_logo.png" alt="BadgeCub logo small">
+        <img src="{{static('/mini_logo.png')}}" alt="BadgeCub logo small">
         <small>An <strong>Open Badges</strong> project</small>
       </a>
     </footer>
