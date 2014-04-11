@@ -1,7 +1,7 @@
 var express = require('express');
 var nunjucks = require('nunjucks');
 var path = require('path');
-var config = require('config-store')(path.join(__dirname, './config.json'));
+var config = require('./lib/config');
 var fs = require('fs');
 var Promise = require('bluebird');
 var Uploader = require('./lib/uploader');
