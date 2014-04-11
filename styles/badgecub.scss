@@ -63,6 +63,7 @@ footer {
   text-align: center;
 }
 footer small {
+  font-size: 0.7rem;
   font-family: "Open Sans Light", "Helvetica Neue Light", sans-serif;
   display: block;
   color: #7AD69C;
@@ -117,4 +118,12 @@ button.secondary:active {
 }
 .error small.error {
   background-color: #F8933B;
+}
+.intro {
+  margin-top: 3em;
+  margin-bottom: 2em;
+  * {
+    display: block;
+    margin: 0 auto;
+  }
 }

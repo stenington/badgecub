@@ -149,7 +149,7 @@ function prepForm (opts) {
     ]);
 
     if (opts.validate && !form.validate(req)) {
-      return res.render('index.html', {
+      return res.render('make.html', {
         formFields: form.templateData()
       });
     }
@@ -158,13 +158,17 @@ function prepForm (opts) {
   };
 }
 
-app.get('/', [prepForm()], function (req, res, next) {
-  return res.render('index.html', {
+app.get('/', function (req, res, next) {
+  res.render('index.html');
+});
+
+app.get('/make', [prepForm()], function (req, res, next) {
+  return res.render('make.html', {
     formFields: req.form.templateData()
   });
 });
 
-app.post('/', [isAction('preview'), prepForm({validate: true})], function (req, res, next) {
+app.post('/make', [isAction('preview'), prepForm({validate: true})], function (req, res, next) {
   var form = req.form;
   var data = form.formData();
   var badge = new Badge({
@@ -186,7 +190,7 @@ app.post('/', [isAction('preview'), prepForm({validate: true})], function (req, 
   });
 });
 
-app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, res, next) {
+app.post('/make', [isAction('issue'), prepForm({validate: true})], function (req, res, next) {
   var form = req.form;
   var data = form.formData();
   var badge = new Badge({
@@ -227,7 +231,7 @@ app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, re
     return e.field && e.message;
   }, function (e) {
     form.error(e.field, e.message);
-    return res.render('index.html', {
+    return res.render('make.html', {
       formFields: form.templateData()
     });
   }).catch(function (e) {

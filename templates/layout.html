@@ -11,6 +11,7 @@
   {% endblock %}
 </head>
 <body>
+  {% block outer_body %}
   <div class="page">
     {% block body %}
     {% endblock %}
@@ -21,5 +22,6 @@
       </a>
     </footer>
   </div>
+  {% endblock %}
 </body>
 </html>

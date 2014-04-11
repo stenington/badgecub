@@ -1,20 +1,25 @@
 {% extends "layout.html" %}
-
-{% block body %}
-  <form action="/" method="post" enctype="multipart/form-data">
-    <div class="row">
-      <div class="small-12 text-center columns">
-        <h1>Make a badge for someone you love.</h1>
-      </div>
+{% block headend %}
+  <style>
+    body {
+      background-color: white;
+    }
+  </style>
+{% endblock %}
+{% block outer_body %}
+  <div class="row">
+    <div class="small-12 text-center columns">
+      <h1 class="intro">
+        <img src="{{static('logo.png')}}" alt="Badger face" class="logo" />
+        <img src="{{static('logo_title.png')}}" alt="BadgeCub"  class="wordmark" />
+        <small>Send someone a little badge love</small>
+      </h1>
+      <nav>
+        <a href="/make" class="button">Get Started</a>
+      </nav>
+      <footer>
+        <small>An <strong>Open Badges</strong> project</small>
+      </footer>
     </div>
-    {% for el in formFields %}
-      {% include "form-element.html" %}
-    {% endfor %}
-    <div class="row">
-      <div class="small-12 text-center columns">
-        <button class="secondary" name="action" value="preview">Preview</button>
-        <button type="submit" name="action" value="issue">Give</button>
-      </div>
-    </div>
-  </form>
+  </div>
 {% endblock %}
