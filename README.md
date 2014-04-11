@@ -5,7 +5,8 @@
 Specify in the environment:
 
 * Mandatory:
-    * `ISSUER_URL`: http://full-url.org
+    * `ISSUER_NAME`: Your site name
+    * `ISSUER_URL`: Base url of your issuer site
     * `MANDRILL_KEY`: Mandrill API key
     * `AWS_KEY`: AWS key
     * `AWS_SECRET`: AWS secret
@@ -31,6 +32,7 @@ or write a `./config.json` file with similar keys, like:
   "port": 3002,
   "privateKey": "path/to/private_key.pem",
   "issuer": {
+    "name": "My Org Name Or Whatever",
     "url": "http://full-url.org",
   },
   "mandrill": {

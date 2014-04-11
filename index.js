@@ -23,6 +23,7 @@ function DataURI (path) {
 const PORT = config('PORT', 3001);
 const PRIVATE_KEY = config('PRIVATE_KEY', undefined) ? 
   config('PRIVATE_KEY') : fs.readFileSync(config('PRIVATE_KEY_FILE', './rsa-private.pem'));
+const ISSUER_NAME = config('ISSUER_NAME');
 const ISSUER_URL = config('ISSUER_URL');
 const MANDRILL_KEY = config('MANDRILL_KEY');
 const AWS_CREDENTIALS = {
@@ -217,6 +218,13 @@ app.get('/:page.html', function (req, res, next) {
   return res.render(template, function (err, html) {
     if (err) return res.send(404);
     return res.send(html);
+  });
+});
+
+app.get('/issuer.json', function (req, res, next) {
+  return res.json({
+    name: ISSUER_NAME,
+    url: ISSUER_URL
   });
 });
 
