@@ -21,7 +21,8 @@ function DataURI (path) {
 }
 
 const PORT = config('PORT', 3001);
-const PRIVATE_KEY = fs.readFileSync(config('PRIVATE_KEY', './rsa-private.pem'));
+const PRIVATE_KEY = config('PRIVATE_KEY', undefined) ? 
+  config('PRIVATE_KEY') : fs.readFileSync(config('PRIVATE_KEY_FILE', './rsa-private.pem'));
 const ISSUER_URL = config('ISSUER_URL');
 const MANDRILL_KEY = config('MANDRILL_KEY');
 const AWS_CREDENTIALS = {

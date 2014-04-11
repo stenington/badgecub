@@ -14,7 +14,8 @@ Specify in the environment:
     * `EMAIL_FROM_NAME`: Sender name on badge award emails
     * `EMAIL_FROM_EMAIL`: Sender return address on badge award emails
 * Optional:
-    * `PRIVATE_KEY`: Path to private key .pem, default: `./rsa-private.pem`
+    * `PRIVATE_KEY`: Your private key, defaults to reading from `PRIVATE_KEY_FILE`
+    * `PRIVATE_KEY_FILE`: Path to private key .pem, default: `./rsa-private.pem`
     * `PORT`: Port to use, default: 3001
     * `SERVICE_URL`: Url to use for linking back to the app, default: http://localhost:<PORT>
     * `ASSERTION_SALT`: Salt to use when hashing email addresses, default: undefined
