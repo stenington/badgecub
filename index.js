@@ -211,6 +211,7 @@ app.use(function(err, req, res, next) {
         + "\n\nPlease feel free to provide more context about what you were doing when the error occurred.\n\nThanks!"
     }
   });
+  console.error(err);
   return res.render('error.html', {
     error: err,
     issueUrl: issueUrl
