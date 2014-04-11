@@ -13,14 +13,13 @@ Specify in the environment:
     * `AWS_BUCKET`: AWS bucket
     * `EMAIL_SUBJECT`: Subject of badge award emails
 * Optional:
+    * `PORT`: Port to use, default: 3001
+    * `STATIC_ASSET_URL`: If set, this url will be prepended to all static asset paths
+    * `AWS_PATH`: A base path to use within the bucket, default: `/`
     * `PRIVATE_KEY`: Your private key, defaults to reading from `PRIVATE_KEY_FILE`
     * `PRIVATE_KEY_FILE`: Path to private key .pem, default: `./rsa-private.pem`
-    * `PORT`: Port to use, default: 3001
-    * `SERVICE_URL`: Url to use for linking back to the app, default: http://localhost:<PORT>
     * `ASSERTION_SALT`: Salt to use when hashing email addresses, default: undefined
     * `ASSERTION_EXPIRES`: Number of days after which an assertion expires, default: no expiration
-    * `AWS_PATH`: A base path to use within the bucket, default: `/`
-    * `STATIC_ROOT`: The root path or url to prepend to static asset paths, default: /static
     * `DEBUG`: Turn debug on, default: false
 
 or write a `./config.json` file with similar keys, like:

@@ -1,6 +1,7 @@
 var express = require('express');
 var nunjucks = require('nunjucks');
 var path = require('path');
+var url = require('url');
 var config = require('./lib/config');
 var fs = require('fs');
 var Promise = require('bluebird');
@@ -31,7 +32,12 @@ const AWS_CREDENTIALS = {
   secret: config('AWS_SECRET'),
   bucket: config('AWS_BUCKET')
 };
+const STATIC_ASSET_URL = config('STATIC_ASSET_URL', undefined);
 const DEBUG = config('DEBUG', false);
+
+var staticDir = path.join(__dirname, '/static');
+var staticRoot = '/static';
+var expiration = DEBUG ? 0 : 86400000 * 365;
 
 var bodyTpl = nunjucks.compile(fs.readFileSync(path.join(__dirname, './templates/mail.html')).toString());
 var uploader = new Uploader(AWS_CREDENTIALS);
@@ -39,7 +45,8 @@ var emailer = new Emailer({
   key: MANDRILL_KEY,
   template: bodyTpl,
   subject: config('EMAIL_SUBJECT'),
-  serviceUrl: config('SERVICE_URL', 'http://localhost:' + PORT)
+  serviceUrl: ISSUER_URL,
+  staticUrl: STATIC_ASSET_URL || url.resolve(ISSUER_URL, path.join('.', staticRoot, '/'))
 });
 
 var app = express();
@@ -47,14 +54,12 @@ var app = express();
 var env = new nunjucks.Environment(new nunjucks.FileSystemLoader('templates'));
 env.express(app);
 
-var staticDir = path.join(__dirname, '/static');
-var staticRoot = '/static';
-var expiration = DEBUG ? 0 : 86400000 * 365;
-
 app.use(function (req, res, next) {
   res.locals.static = function static (staticPath) {
-    var root = config('STATIC_ROOT', staticRoot);
-    return path.join(root, staticPath);
+    if (STATIC_ASSET_URL)
+      return url.resolve(STATIC_ASSET_URL, path.join('.', staticPath));
+    else
+      return path.join(staticRoot, staticPath);
   }
   next();
 });
@@ -183,6 +188,7 @@ app.post('/make', [isAction('preview'), prepForm({validate: true})], function (r
       imgSrc: dataUri,
       badge: badge,
       message: data.msg,
+      serviceUrl: ISSUER_URL,
       passthrough: form.templateData()
     });
   }).catch(function (e) {
