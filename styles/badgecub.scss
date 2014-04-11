@@ -122,6 +122,11 @@ button.secondary:active {
 .intro {
   margin-top: 3em;
   margin-bottom: 2em;
+
+  small {
+    line-height: 100%;
+  }
+
   * {
     display: block;
     margin: 0 auto;
