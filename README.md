@@ -12,8 +12,6 @@ Specify in the environment:
     * `AWS_SECRET`: AWS secret
     * `AWS_BUCKET`: AWS bucket
     * `EMAIL_SUBJECT`: Subject of badge award emails
-    * `EMAIL_FROM_NAME`: Sender name on badge award emails
-    * `EMAIL_FROM_EMAIL`: Sender return address on badge award emails
 * Optional:
     * `PRIVATE_KEY`: Your private key, defaults to reading from `PRIVATE_KEY_FILE`
     * `PRIVATE_KEY_FILE`: Path to private key .pem, default: `./rsa-private.pem`
@@ -45,11 +43,7 @@ or write a `./config.json` file with similar keys, like:
     "path": "my/path/"
   },
   "email": {
-    "subject": "Hi",
-    "from": {
-      "name": "me",
-      "email": "me@example.org"
-    }
+    "subject": "Hi"
   },
   "assertion": {
     "salt": "salty",

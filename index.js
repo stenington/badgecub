@@ -39,10 +39,6 @@ var emailer = new Emailer({
   key: MANDRILL_KEY,
   template: bodyTpl,
   subject: config('EMAIL_SUBJECT'),
-  from: {
-    name: config('EMAIL_FROM_NAME'),
-    email: config('EMAIL_FROM_EMAIL')
-  },
   serviceUrl: config('SERVICE_URL', 'http://localhost:' + PORT)
 });
 
@@ -98,7 +94,7 @@ function prepForm (opts) {
         required: true
       },
       {
-        name: 'name',
+        name: 'title',
         label: 'Title',
         type: 'text',
         attrs: {
@@ -125,11 +121,29 @@ function prepForm (opts) {
         required: true
       },
       {
+        name: 'name',
+        label: 'Your name',
+        type: 'text',
+        attrs: {
+          placeholder: 'Pretty self-explanatory.'
+        },
+        required: true
+      },
+      {
+        name: 'sender',
+        label: 'Your email',
+        type: 'text',
+        attrs: {
+          placeholder: 'So they can badge you back!'
+        },
+        required: true
+      },
+      {
         name: 'msg',
         label: 'Message',
         type: 'textarea',
         attrs: {
-          placeholder: 'Tell your badger why they deserve this masterpiece of a badge. If you have a link that proves it, add that in the mix too.'
+          placeholder: 'Tell your badger why they deserve this masterpiece of a badge.'
         }
       }
     ]);
@@ -154,7 +168,7 @@ app.post('/', [isAction('preview'), prepForm({validate: true})], function (req, 
   var form = req.form;
   var data = form.formData();
   var badge = new Badge({
-    name: data.name,
+    name: data.title,
     description: data.desc,
     imagePath: data.badgeImage,
     issuerUrl: ISSUER_URL
@@ -176,7 +190,7 @@ app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, re
   var form = req.form;
   var data = form.formData();
   var badge = new Badge({
-    name: data.name,
+    name: data.title,
     description: data.desc,
     imagePath: data.badgeImage,
     issuerUrl: ISSUER_URL
@@ -192,7 +206,15 @@ app.post('/', [isAction('issue'), prepForm({validate: true})], function (req, re
     }).sign(PRIVATE_KEY).bake();
   }).then(function (baked) {
     debug('Send email');
-    return emailer.send({to: data.recipient, message: data.msg, baked: baked});
+    return emailer.send({
+      to: data.recipient, 
+      from: {
+        name: data.name,
+        email: data.sender
+      },
+      message: data.msg, 
+      baked: baked
+    });
   }).then(function () {
     return new DataURI(data.badgeImage);
   }).then(function (dataUri) {
