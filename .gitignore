@@ -4,3 +4,4 @@ coverage/
 *.log
 config.json
 *.pem
+.env
